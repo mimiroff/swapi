@@ -1,29 +1,37 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
+    <button v-if="show" @click="listStarships">List Starships</button>
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
+<script>
+import axios from "./axios";
+
+export default {
+  computed: {
+    starships() {
+      this.$store.getters.starships()
+    };
+  },
+  methods: {
+    listStarships() {
+      console.log(this.starships);
+    },
+    loadData(path) {
+      axios.get(path).then(res => {
+        this.$store.dispatch('addStarships', res.data.results);
+        if (res.data.next) {
+          this.loadData(res.data.next);
+        }
+        this.show = true;
+      });
     }
+  },
+  mounted() {
+    this.loadData('starships/');
   }
-}
+};
+</script>
+
+<style lang="scss">
 </style>
